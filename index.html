@@ -8,512 +8,258 @@
     body {
       margin: 0;
       overflow: hidden;
+      background: skyblue;
+      font-family: Arial, sans-serif;
     }
 
-    #game {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      background-color: #cceeff;
-      overflow: hidden;
-    }
-
-    #background {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-      top: 0;
-      left: 0;
-    }
-
-    #timer {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      font-size: 24px;
-      font-weight: bold;
-      color: white;
-      z-index: 2;
-      text-shadow: 2px 2px 4px black;
-    }
-
-    #gun {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 25vw;
-      max-width: 150px;
-      z-index: 2;
-    }
-
-    #scoreBoard {
-      position: fixed;
-      top: 35px;
-      left: 1px;
-      font-size: 24px;
-      text-shadow: 2px 2px 4px black;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 10px;
-    }
-
-    .goose {
-      position: absolute;
-      cursor: pointer;
-      z-index: 1;
-    }
-
-    .falling {
-      transform: rotate(90deg);
-      transition: top 1s;
-      top: 500px !important;
-    }
-
-    #levelPopup {
-      display: none;
-      position: fixed;
-      top: 30%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      padding: 20px 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      text-align: center;
-      z-index: 999;
-      width: 90%;
-      max-width: 400px;
-      box-sizing: border-box;
-    }
-
-    #levelPopup button {
-      padding: 8px 16px;
-      font-size: 16px;
-      margin-top: 10px;
-      margin-right: 10px;
-    }
-
-    #stars {
-      font-size: 30px;
-      margin: 10px 0;
-    }
-
-    #startPopup {
-      position: fixed;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -30%);
-      background: white;
-      padding: 30px 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      text-align: center;
-      z-index: 1000;
-    }
-
-    #startPopup button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-
-    #instructions {
-      display: none;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-
-    #pauseBtn {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 10;
-      font-size: 24px;
-      background: rgba(255,255,255,0.8);
-      border: none;
-      padding: 10px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    #pauseMenu {
-      display: none;
-      position: fixed;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -30%);
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      z-index: 1001;
-      box-shadow: 0 0 10px black;
-      text-align: center;
-    }
-
-    #pauseMenu button {
+    #gameCanvas {
       display: block;
-      margin: 10px auto;
-      padding: 10px 20px;
-      font-size: 16px;
+      background: url('https://i.imgur.com/zUMHbOW.jpg') no-repeat center center;
+      background-size: cover;
     }
 
-    #levelSelector {
-      display: none;
-      position: fixed;
-      top: 10%;
+    .ui {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 18px;
+      text-shadow: 2px 2px 4px #000;
+    }
+
+    .popup {
+      position: absolute;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-      background: white;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      z-index: 1000;
       text-align: center;
+      display: none;
+      z-index: 2;
     }
 
-    #levelButtons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      max-height: 400px;
-      overflow: auto;
-      margin-bottom: 10px;
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
     }
 
-    #levelButtons button {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 1px solid #000;
-      text-align: center;
-      white-space: pre-line;
-      font-size: 14px;
+    #pauseButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
-  <div id="game">
-    <div id="timer">Time: 40s</div>
-    <img src="background.jpg" id="background" alt="Background" />
-    <img src="gun.png" id="gun" alt="Gun" />
-  </div>
-  <div id="scoreBoard">Score: 0</div>
-  <button id="pauseBtn">⏸️</button>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
 
-  <div id="pauseMenu">
-    <h3>Game Paused</h3>
+  <div class="ui">
+    Score: <span id="score">0</span> |
+    Time: <span id="time">60</span> |
+    Level: <span id="level">1</span>
+  </div>
+
+  <button id="pauseButton">Pause</button>
+
+  <div id="pausePopup" class="popup">
+    <h2>Game Paused</h2>
     <button onclick="resumeGame()">Resume</button>
     <button onclick="restartGame()">Restart</button>
-    <button onclick="goToMenu()">Go to Menu</button>
   </div>
 
-  <audio id="shootSound" src="https://www.fesliyanstudios.com/play-mp3/387"></audio>
-  <audio id="hitSound" src="https://www.fesliyanstudios.com/play-mp3/6676"></audio>
-
-  <div id="startPopup">
-    <img src="kk.png" alt="Logo" style="width: 100px; margin-bottom: 10px;" />
-    <h2>Goose Shooting Game</h2>
-    <button id="continueBtn">Continue</button>
-    <button id="newGameBtn">New Game</button>
-    <button id="howToPlayBtn">How to Play</button>
-    <div id="instructions">
-      Click on geese to shoot them.<br/>
-      Each hit gives you 10 or 20 points.<br/>
-      Reach the target score before time runs out!
-    </div>
+  <div id="gameOverPopup" class="popup">
+    <h2>Game Over</h2>
+    <p>Your Score: <span id="finalScore">0</span></p>
+    <button onclick="restartGame()">Play Again</button>
   </div>
 
-  <div id="levelSelector">
-    <h2>Select Level</h2>
-    <div id="levelButtons"></div>
-    <button onclick="document.getElementById('levelSelector').style.display='none'">Close</button>
-    <button onclick="resetProgress()">Reset Progress</button>
-  </div>
-
-  <div id="levelPopup">
-    <div id="popupMessage"></div>
-    <div id="stars"></div>
-    <button id="nextBtn">Next Level</button>
-    <button id="retryBtn">Try Again</button>
-  </div>
+  <audio id="shootSound" src="https://freesound.org/data/previews/66/66717_931655-lq.mp3"></audio>
+  <audio id="hitSound" src="https://freesound.org/data/previews/82/82921_1022654-lq.mp3"></audio>
 
   <script>
-    let score = 0;
-    let level = 1;
-    let speed = 5;
-    let timer = 40;
-    let gameTimer;
-    let isPaused = false;
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-    const scoreBoard = document.getElementById('scoreBoard');
+    const scoreDisplay = document.getElementById('score');
+    const timeDisplay = document.getElementById('time');
+    const levelDisplay = document.getElementById('level');
+    const finalScoreDisplay = document.getElementById('finalScore');
+
+    const pausePopup = document.getElementById('pausePopup');
+    const gameOverPopup = document.getElementById('gameOverPopup');
+
     const shootSound = document.getElementById('shootSound');
     const hitSound = document.getElementById('hitSound');
-    const timerDisplay = document.getElementById("timer");
 
-    window.addEventListener('DOMContentLoaded', () => {
-      let hasProgress = false;
-      for (let i = 2; i <= 100; i++) {
-        if (localStorage.getItem(`level_${i}_stars`)) {
-          hasProgress = true;
-          break;
+    const pauseButton = document.getElementById('pauseButton');
+
+    let score = 0;
+    let timeLeft = 60;
+    let level = 1;
+    let paused = false;
+    let gameOver = false;
+
+    let gooseImage = new Image();
+    gooseImage.src = 'https://i.imgur.com/oCkEbrA.png'; // Goose image
+
+    let geese = [];
+    const gooseCountPerLevel = [3, 5, 7, 10];
+
+    function spawnGeese(count) {
+      geese = [];
+      for (let i = 0; i < count; i++) {
+        const size = 80;
+        const y = Math.random() * (canvas.height - size);
+        const speed = 2 + Math.random() * level;
+        const direction = Math.random() < 0.5 ? 1 : -1;
+
+        const x = direction === 1 ? -size : canvas.width + size;
+
+        geese.push({ x, y, size, speed, direction });
+      }
+    }
+
+    function updateGeese() {
+      geese.forEach(goose => {
+        goose.x += goose.speed * goose.direction;
+
+        // If goose leaves screen, respawn it
+        if (goose.direction === 1 && goose.x > canvas.width + goose.size) {
+          goose.x = -goose.size;
+          goose.y = Math.random() * (canvas.height - goose.size);
+        } else if (goose.direction === -1 && goose.x < -goose.size) {
+          goose.x = canvas.width + goose.size;
+          goose.y = Math.random() * (canvas.height - goose.size);
         }
+      });
+    }
+
+    function drawGeese() {
+      geese.forEach(goose => {
+        ctx.save();
+        ctx.translate(goose.x + goose.size / 2, goose.y + goose.size / 2);
+        if (goose.direction === 1) {
+          ctx.scale(-1, 1); // Flip horizontally
+        }
+        ctx.drawImage(gooseImage, -goose.size / 2, -goose.size / 2, goose.size, goose.size);
+        ctx.restore();
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawGeese();
+    }
+
+    function gameLoop() {
+      if (!paused && !gameOver) {
+        updateGeese();
+        draw();
       }
-      if (!hasProgress) {
-        document.getElementById('continueBtn').style.display = 'none';
-      }
-    });
+      requestAnimationFrame(gameLoop);
+    }
+
+    function shoot(event) {
+      if (paused || gameOver) return;
+
+      shootSound.currentTime = 0;
+      shootSound.play();
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      geese.forEach((goose, index) => {
+        if (
+          mouseX >= goose.x &&
+          mouseX <= goose.x + goose.size &&
+          mouseY >= goose.y &&
+          mouseY <= goose.y + goose.size
+        ) {
+          hitSound.currentTime = 0;
+          hitSound.play();
+          score += 10;
+          scoreDisplay.textContent = score;
+
+          // Respawn goose
+          const size = 80;
+          const direction = Math.random() < 0.5 ? 1 : -1;
+          const x = direction === 1 ? -size : canvas.width + size;
+          const y = Math.random() * (canvas.height - size);
+          const speed = 2 + Math.random() * level;
+          geese[index] = { x, y, size, speed, direction };
+
+          // Check for level up
+          if (score % 100 === 0) {
+            level++;
+            levelDisplay.textContent = level;
+            spawnGeese(gooseCountPerLevel[Math.min(level - 1, gooseCountPerLevel.length - 1)]);
+          }
+        }
+      });
+    }
 
     function startTimer() {
-      clearInterval(gameTimer);
-      gameTimer = setInterval(() => {
-        if (!isPaused) {
-          timer--;
-          timerDisplay.textContent = `Time: ${timer}s`;
-          if (timer <= 0) {
+      const timerInterval = setInterval(() => {
+        if (!paused && !gameOver) {
+          timeLeft--;
+          timeDisplay.textContent = timeLeft;
+
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
             endGame();
           }
         }
       }, 1000);
     }
 
-    function createGoose() {
-      const goose = document.createElement('img');
-      goose.classList.add('goose');
-      const isBig = Math.random() < 0.2;
-      goose.src = "Untitled-video-Made-with-Clipc-unscreen.gif";
-      goose.style.width = isBig ? "200px" : "150px";
-      goose.dataset.points = isBig ? 20 : 10;
-
-      goose.style.top = Math.random() * (window.innerHeight / 2) + 'px';
-      const bg = document.getElementById('background');
-      const bgRect = bg.getBoundingClientRect();
-      goose.style.left = bgRect.right - 150 + 'px';
-
-      goose.direction = -1;
-      goose.style.transform = "scaleX(-1)";
-      document.body.appendChild(goose);
-
-      function moveGoose() {
-        if (goose.classList.contains('falling') || isPaused) {
-          requestAnimationFrame(moveGoose);
-          return;
-        }
-
-        const left = parseInt(goose.style.left, 10) || goose.getBoundingClientRect().left;
-        goose.style.left = left + goose.direction * (speed / 10) + 'px';
-
-        if (left < bgRect.left - 160) {
-          goose.remove();
-          createGoose();
-          return;
-        }
-
-        requestAnimationFrame(moveGoose);
-      }
-
-      goose.addEventListener('click', (e) => {
-        e.stopPropagation();
-        hitSound.play();
-        goose.classList.add('falling');
-        score += parseInt(goose.dataset.points);
-        scoreBoard.innerText = `Score: ${score}`;
-        setTimeout(() => {
-          goose.remove();
-          createGoose();
-        }, 2000);
-      });
-
-      moveGoose();
-    }
-
-    function spawnGeese(count) {
-      for (let i = 0; i < count; i++) {
-        setTimeout(() => createGoose(), i * 300);
-      }
-    }
-
     function endGame() {
-      clearInterval(gameTimer);
-      showLevelPopup();
+      gameOver = true;
+      finalScoreDisplay.textContent = score;
+      gameOverPopup.style.display = 'block';
     }
 
-    function updateStars(level, score, target) {
-      const percentage = (score / target) * 100;
-      let stars = 1;
-      if (percentage >= 90) stars = 3;
-      else if (percentage >= 60) stars = 2;
-      localStorage.setItem(`level_${level}_stars`, '⭐'.repeat(stars));
+    function pauseGame() {
+      paused = true;
+      pausePopup.style.display = 'block';
     }
-
-    function showLevelPopup() {
-      const popup = document.getElementById("levelPopup");
-      const popupMessage = document.getElementById("popupMessage");
-      const starsContainer = document.getElementById("stars");
-      const nextBtn = document.getElementById("nextBtn");
-      const retryBtn = document.getElementById("retryBtn");
-
-      const target = level * 100;
-      const percentage = (score / target) * 100;
-      let stars = '';
-
-      if (percentage >= 90) stars = '⭐⭐⭐';
-      else if (percentage >= 60) stars = '⭐⭐';
-      else stars = '⭐';
-
-      starsContainer.innerText = stars;
-      updateStars(level, score, target);
-
-      if (score >= target) {
-        popupMessage.innerText = `Level ${level} Complete!`;
-        nextBtn.style.display = 'inline-block';
-        retryBtn.style.display = 'none';
-      } else {
-        popupMessage.innerText = `Try Again! Score: ${score} / ${target}`;
-        nextBtn.style.display = 'none';
-        retryBtn.style.display = 'inline-block';
-      }
-
-      popup.style.display = 'block';
-    }
-
-    document.getElementById("nextBtn").addEventListener("click", () => {
-      document.getElementById("levelPopup").style.display = "none";
-      level++;
-      speed += 1;
-      timer = 40;
-      score = 0;
-      timerDisplay.textContent = `Time: ${timer}s`;
-      scoreBoard.innerText = `Score: ${score}`;
-      document.querySelectorAll('.goose').forEach(g => g.remove());
-      startTimer();
-      spawnGeese(level);
-    });
-
-    document.getElementById("retryBtn").addEventListener("click", () => {
-      document.getElementById("levelPopup").style.display = "none";
-      timer = 40;
-      score = 0;
-      timerDisplay.textContent = `Time: ${timer}s`;
-      scoreBoard.innerText = `Score: ${score}`;
-      document.querySelectorAll('.goose').forEach(g => g.remove());
-      startTimer();
-      spawnGeese(level);
-    });
-
-    window.addEventListener('click', () => shootSound.play());
-
-    document.getElementById("pauseBtn").addEventListener("click", () => {
-      isPaused = true;
-      document.getElementById("pauseMenu").style.display = "block";
-    });
 
     function resumeGame() {
-      isPaused = false;
-      document.getElementById("pauseMenu").style.display = "none";
+      paused = false;
+      pausePopup.style.display = 'none';
     }
 
     function restartGame() {
-      document.getElementById("pauseMenu").style.display = "none";
       score = 0;
-      timer = 40;
-      timerDisplay.textContent = `Time: ${timer}s`;
-      scoreBoard.innerText = `Score: ${score}`;
-      document.querySelectorAll('.goose').forEach(g => g.remove());
-      isPaused = false;
+      timeLeft = 60;
+      level = 1;
+      paused = false;
+      gameOver = false;
+      scoreDisplay.textContent = score;
+      timeDisplay.textContent = timeLeft;
+      levelDisplay.textContent = level;
+      pausePopup.style.display = 'none';
+      gameOverPopup.style.display = 'none';
+      spawnGeese(gooseCountPerLevel[0]);
       startTimer();
-      spawnGeese(level);
     }
 
-    function goToMenu() {
-      location.reload();
-    }
+    // Event listeners
+    canvas.addEventListener('click', shoot);
+    pauseButton.addEventListener('click', pauseGame);
 
-    document.getElementById('continueBtn').addEventListener('click', () => {
-      let lastLevel = 1;
-      for (let i = 100; i >= 1; i--) {
-        if (localStorage.getItem(`level_${i}_stars`)) {
-          lastLevel = i;
-          break;
-        }
-      }
-
-      level = lastLevel;
-      speed = 5 + (level - 1);
-      timer = 40;
-      score = 0;
-      timerDisplay.textContent = `Time: ${timer}s`;
-      scoreBoard.innerText = `Score: ${score}`;
-      document.getElementById("startPopup").style.display = "none";
-      document.querySelectorAll('.goose').forEach(g => g.remove());
-      spawnGeese(level);
+    // Start game
+    gooseImage.onload = () => {
+      spawnGeese(gooseCountPerLevel[0]);
       startTimer();
-    });
-
-    document.getElementById('newGameBtn').addEventListener('click', () => {
-      if (confirm("Start a new game? All progress will be lost.")) {
-        for (let i = 1; i <= 100; i++) {
-          localStorage.removeItem(`level_${i}_stars`);
-        }
-        level = 1;
-        speed = 5;
-        timer = 40;
-        score = 0;
-        timerDisplay.textContent = `Time: ${timer}s`;
-        scoreBoard.innerText = `Score: ${score}`;
-        document.getElementById("startPopup").style.display = "none";
-        document.querySelectorAll('.goose').forEach(g => g.remove());
-        spawnGeese(level);
-        startTimer();
-      }
-    });
-
-    document.getElementById('howToPlayBtn').addEventListener('click', () => {
-      const instr = document.getElementById('instructions');
-      instr.style.display = instr.style.display === 'none' ? 'block' : 'none';
-    });
-
-    function showLevelSelector() {
-      const levelButtons = document.getElementById('levelButtons');
-      levelButtons.innerHTML = '';
-      for (let i = 1; i <= 100; i++) {
-        const btn = document.createElement('button');
-        const stars = localStorage.getItem(`level_${i}_stars`);
-        btn.innerHTML = `<div>${i}</div><div style="font-size:12px;">${stars || ''}</div>`;
-        if (!stars && i !== 1) {
-          btn.disabled = true;
-          btn.style.opacity = 0.5;
-        }
-        btn.addEventListener('click', () => {
-          level = i;
-          speed = 5 + (level - 1);
-          timer = 40;
-          score = 0;
-          timerDisplay.textContent = `Time: ${timer}s`;
-          scoreBoard.innerText = `Score: ${score}`;
-          document.getElementById("startPopup").style.display = "none";
-          document.getElementById("levelSelector").style.display = "none";
-          document.querySelectorAll('.goose').forEach(g => g.remove());
-          spawnGeese(level);
-          startTimer();
-        });
-        levelButtons.appendChild(btn);
-      }
-      document.getElementById('levelSelector').style.display = 'block';
-    }
-
-    function resetProgress() {
-      if (confirm("Are you sure you want to reset all progress?")) {
-        for (let i = 1; i <= 100; i++) {
-          localStorage.removeItem(`level_${i}_stars`);
-        }
-        alert("Progress reset!");
-        showLevelSelector();
-      }
-    }
+      gameLoop();
+    };
   </script>
 </body>
 </html>
