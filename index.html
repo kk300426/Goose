@@ -136,6 +136,37 @@
       border-radius: 50%;
       cursor: pointer;
     }
+
+    #levelSelector {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      z-index: 1000;
+      text-align: center;
+    }
+
+    #levelButtons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      max-height: 400px;
+      overflow: auto;
+      margin-bottom: 10px;
+    }
+
+    #levelButtons button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid #000;
+    }
   </style>
 </head>
 <body>
@@ -162,6 +193,13 @@
     </div>
   </div>
 
+  <div id="levelSelector">
+    <h2>Select Level</h2>
+    <div id="levelButtons"></div>
+    <button onclick="document.getElementById('levelSelector').style.display='none'">Close</button>
+    <button onclick="resetProgress()">Reset Progress</button>
+  </div>
+
   <div id="levelPopup">
     <div id="popupMessage"></div>
     <div id="stars"></div>
@@ -173,7 +211,7 @@
     let score = 0;
     let level = 1;
     let speed = 5;
-    let timer = 40; // Changed from 60 to 40
+    let timer = 40;
     let gameTimer;
     let hasSavedState = false;
     let savedScore = 0;
@@ -222,7 +260,6 @@
         const left = parseInt(goose.style.left, 10) || goose.getBoundingClientRect().left;
         goose.style.left = left + goose.direction * speed + 'px';
 
-        // Despawn goose if offscreen to the left
         if (left < bgRect.left - 160) {
           goose.remove();
           createGoose();
@@ -261,6 +298,19 @@
       showLevelPopup();
     }
 
+    function updateStars(level, score, target) {
+      const percentage = (score / target) * 100;
+      let stars = 1;
+      if (percentage >= 90) stars = 3;
+      else if (percentage >= 60) stars = 2;
+      localStorage.setItem(`level_${level}_stars`, '⭐'.repeat(stars));
+
+      let scores = JSON.parse(localStorage.getItem(`level_${level}_scores`) || '[]');
+      scores.push(score);
+      scores.sort((a, b) => b - a);
+      localStorage.setItem(`level_${level}_scores`, JSON.stringify(scores.slice(0, 5)));
+    }
+
     function showLevelPopup() {
       const popup = document.getElementById("levelPopup");
       const popupMessage = document.getElementById("popupMessage");
@@ -277,6 +327,7 @@
       else stars = '⭐';
 
       starsContainer.innerText = stars;
+      updateStars(level, score, target);
 
       if (score >= target) {
         popupMessage.innerText = `Level ${level} Complete!`;
@@ -315,26 +366,14 @@
       spawnGeese(level);
     });
 
-    window.addEventListener('click', () => {
-      shootSound.play();
-    });
+    window.addEventListener('click', () => shootSound.play());
 
-    // Pause button logic
     pauseBtn.addEventListener("click", () => {
       isPaused = !isPaused;
       pauseBtn.textContent = isPaused ? "▶️" : "⏸️";
     });
 
-    document.getElementById('startPopup').style.display = 'block';
-
-    document.getElementById('newGameBtn').addEventListener('click', () => {
-      score = 0;
-      level = 1;
-      speed = 5;
-      timer = 40;
-      hasSavedState = true;
-      startGame();
-    });
+    document.getElementById('newGameBtn').addEventListener('click', showLevelSelector);
 
     document.getElementById('continueBtn').addEventListener('click', () => {
       if (hasSavedState) {
@@ -357,6 +396,42 @@
       scoreBoard.innerText = `Score: ${score}`;
       spawnGeese(level);
       startTimer();
+    }
+
+    function showLevelSelector() {
+      const levelButtons = document.getElementById('levelButtons');
+      levelButtons.innerHTML = '';
+      for (let i = 1; i <= 100; i++) {
+        const btn = document.createElement('button');
+        const stars = localStorage.getItem(`level_${i}_stars`);
+        btn.textContent = stars ? `${i}\n${stars}` : i;
+        btn.addEventListener('click', () => {
+          level = i;
+          speed = 5 + (level - 1);
+          timer = 40;
+          score = 0;
+          timerDisplay.textContent = `Time: ${timer}s`;
+          scoreBoard.innerText = `Score: ${score}`;
+          document.getElementById("startPopup").style.display = "none";
+          document.getElementById("levelSelector").style.display = "none";
+          document.querySelectorAll('.goose').forEach(g => g.remove());
+          spawnGeese(level);
+          startTimer();
+        });
+        levelButtons.appendChild(btn);
+      }
+      document.getElementById('levelSelector').style.display = 'block';
+    }
+
+    function resetProgress() {
+      if (confirm("Are you sure you want to reset all progress?")) {
+        for (let i = 1; i <= 100; i++) {
+          localStorage.removeItem(`level_${i}_stars`);
+          localStorage.removeItem(`level_${i}_scores`);
+        }
+        alert("Progress reset!");
+        showLevelSelector();
+      }
     }
   </script>
 </body>
