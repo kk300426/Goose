@@ -202,7 +202,7 @@
     <img src="gun.png" id="gun" alt="Gun" />
   </div>
   <div id="scoreBoard">Score: 0</div>
-  <button id="pauseBtn">⏸️</button>
+  <button id="pauseBtn">⏸</button>
 
   <div id="pauseMenu">
     <h3>Game Paused</h3>
@@ -239,6 +239,8 @@
     <button id="nextBtn">Next Level</button>
     <button id="retryBtn">Try Again</button>
   </div>
+  <button id="continueBtn">Continue</button>
+
 
   <script>
     let score = 0;
@@ -259,6 +261,7 @@
         if (!isPaused) {
           timer--;
           timerDisplay.textContent = `Time: ${timer}s`;
+
           if (timer <= 0) {
             endGame();
           }
@@ -306,7 +309,7 @@
         hitSound.play();
         goose.classList.add('falling');
         score += parseInt(goose.dataset.points);
-        scoreBoard.innerText = `Score: ${score}`;
+        scoreBoard.innerText = Score: ${score};
         setTimeout(() => {
           goose.remove();
           createGoose();
@@ -332,7 +335,7 @@
       let stars = 1;
       if (percentage >= 90) stars = 3;
       else if (percentage >= 60) stars = 2;
-      localStorage.setItem(`level_${level}_stars`, '⭐'.repeat(stars));
+     localStorage.setItem(`level_${level}_stars`, '⭐'.repeat(stars));
     }
 
     function showLevelPopup() {
@@ -354,11 +357,11 @@
       updateStars(level, score, target);
 
       if (score >= target) {
-        popupMessage.innerText = `Level ${level} Complete!`;
+        popupMessage.innerText = Level ${level} Complete!;
         nextBtn.style.display = 'inline-block';
         retryBtn.style.display = 'none';
       } else {
-        popupMessage.innerText = `Try Again! Score: ${score} / ${target}`;
+        popupMessage.innerText = Try Again! Score: ${score} / ${target};
         nextBtn.style.display = 'none';
         retryBtn.style.display = 'inline-block';
       }
@@ -372,8 +375,8 @@
       speed += 1;
       timer = 40;
       score = 0;
-      timerDisplay.textContent = `Time: ${timer}s`;
-      scoreBoard.innerText = `Score: ${score}`;
+      timerDisplay.textContent = Time: ${timer}s;
+      scoreBoard.innerText = Score: ${score};
       document.querySelectorAll('.goose').forEach(g => g.remove());
       startTimer();
       spawnGeese(level);
@@ -383,8 +386,8 @@
       document.getElementById("levelPopup").style.display = "none";
       timer = 40;
       score = 0;
-      timerDisplay.textContent = `Time: ${timer}s`;
-      scoreBoard.innerText = `Score: ${score}`;
+      timerDisplay.textContent = Time: ${timer}s;
+      scoreBoard.innerText = Score: ${score};
       document.querySelectorAll('.goose').forEach(g => g.remove());
       startTimer();
       spawnGeese(level);
@@ -406,8 +409,8 @@
       document.getElementById("pauseMenu").style.display = "none";
       score = 0;
       timer = 40;
-      timerDisplay.textContent = `Time: ${timer}s`;
-      scoreBoard.innerText = `Score: ${score}`;
+      timerDisplay.textContent = Time: ${timer}s;
+      scoreBoard.innerText = Score: ${score};
       document.querySelectorAll('.goose').forEach(g => g.remove());
       isPaused = false;
       startTimer();
@@ -427,8 +430,8 @@
 
     function startGame() {
       document.getElementById('startPopup').style.display = 'none';
-      timerDisplay.textContent = `Time: ${timer}s`;
-      scoreBoard.innerText = `Score: ${score}`;
+      timerDisplay.textContent = Time: ${timer}s;
+      scoreBoard.innerText = Score: ${score};
       spawnGeese(level);
       startTimer();
     }
@@ -438,8 +441,8 @@
       levelButtons.innerHTML = '';
       for (let i = 1; i <= 100; i++) {
         const btn = document.createElement('button');
-        const stars = localStorage.getItem(`level_${i}_stars`);
-        btn.innerHTML = `<div>${i}</div><div style="font-size:12px;">${stars || ''}</div>`;
+        const stars = localStorage.getItem(level_${i}_stars);
+        btn.innerHTML = <div>${i}</div><div style="font-size:12px;">${stars || ''}</div>;
         if (!stars && i !== 1) {
           btn.disabled = true;
           btn.style.opacity = 0.5;
@@ -449,8 +452,8 @@
           speed = 5 + (level - 1);
           timer = 40;
           score = 0;
-          timerDisplay.textContent = `Time: ${timer}s`;
-          scoreBoard.innerText = `Score: ${score}`;
+          timerDisplay.textContent = Time: ${timer}s;
+          scoreBoard.innerText = Score: ${score};
           document.getElementById("startPopup").style.display = "none";
           document.getElementById("levelSelector").style.display = "none";
           document.querySelectorAll('.goose').forEach(g => g.remove());
@@ -465,97 +468,62 @@
     function resetProgress() {
       if (confirm("Are you sure you want to reset all progress?")) {
         for (let i = 1; i <= 100; i++) {
-          localStorage.removeItem(`level_${i}_stars`);
+          localStorage.removeItem(level_${i}_stars);
         }
         alert("Progress reset!");
         showLevelSelector();
       }
     }
-document.getElementById('newGameBtn').addEventListener('click', () => {
-      document.getElementById('startPopup').style.display = 'none';
-      document.getElementById('levelSelector').style.display = 'block';
-      generateLevelButtons();
-    });
+	document.getElementById('continueBtn').addEventListener('click', () => {
+  showLevelSelector(false); // show completed and locked levels
+});
+function showLevelSelector(isNewGame = true) {
+  const levelButtons = document.getElementById('levelButtons');
+  levelButtons.innerHTML = '';
 
-    document.getElementById('howToPlayBtn').addEventListener('click', () => {
-      const instructions = document.getElementById('instructions');
-      instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none';
-    });
+  for (let i = 1; i <= 100; i++) {
+    const btn = document.createElement('button');
+    const stars = localStorage.getItem(`level_${i}_stars`);
 
-    document.getElementById('pauseBtn').addEventListener('click', () => {
-      isPaused = true;
-      document.getElementById('pauseMenu').style.display = 'block';
-    });
+    btn.innerHTML = `<div>${i}</div><div style="font-size:12px;">${stars || ''}</div>`;
 
-    function resumeGame() {
-      isPaused = false;
-      document.getElementById('pauseMenu').style.display = 'none';
+    if (isNewGame) {
+      // New Game: only level 1 is enabled
+      if (i !== 1) {
+        btn.disabled = true;
+        btn.style.opacity = 0.5;
+      }
+    } else {
+      // Continue: show completed levels and lock the rest
+      if (!localStorage.getItem(`level_${i}_stars`) && i !== 1) {
+        const prevCompleted = localStorage.getItem(`level_${i - 1}_stars`);
+        if (!prevCompleted) {
+          btn.disabled = true;
+          btn.style.opacity = 0.5;
+        }
+      }
     }
 
-    function restartGame() {
-      location.reload();
-    }
-
-    function goToMenu() {
-      location.reload();
-    }
-
-    function startGame(selectedLevel) {
-      level = selectedLevel;
-      score = 0;
-      speed = level * 5;
+    btn.addEventListener('click', () => {
+      level = i;
+      speed = 5 + (level - 1);
       timer = 40;
-      isPaused = false;
-
-      document.getElementById('levelSelector').style.display = 'none';
-      document.getElementById('pauseMenu').style.display = 'none';
-      document.getElementById('levelPopup').style.display = 'none';
-      document.getElementById('scoreBoard').innerText = `Score: ${score}`;
-      document.getElementById('timer').innerText = `Time: ${timer}s`;
-
+      score = 0;
+      timerDisplay.textContent = `Time: ${timer}s`;
+      scoreBoard.innerText = `Score: ${score}`;
+      document.getElementById("startPopup").style.display = "none";
+      document.getElementById("levelSelector").style.display = "none";
+      document.querySelectorAll('.goose').forEach(g => g.remove());
+      spawnGeese(level);
       startTimer();
-      spawnGeese(level + 2); // Increase geese with level
-    }
-
-    function generateLevelButtons() {
-      const container = document.getElementById('levelButtons');
-      container.innerHTML = '';
-      const totalLevels = 10;
-
-      for (let i = 1; i <= totalLevels; i++) {
-        const button = document.createElement('button');
-        const stars = localStorage.getItem(`level_${i}_stars`) || '';
-        button.innerText = `Level ${i}\n${stars}`;
-        button.onclick = () => startGame(i);
-        container.appendChild(button);
-      }
-    }
-
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      level++;
-      startGame(level);
     });
 
-    document.getElementById('retryBtn').addEventListener('click', () => {
-      startGame(level);
-    });
+    levelButtons.appendChild(btn);
+  }
 
-    function resetProgress() {
-      for (let i = 1; i <= 10; i++) {
-        localStorage.removeItem(`level_${i}_stars`);
-      }
-      generateLevelButtons();
-    }
+  document.getElementById('levelSelector').style.display = 'block';
+}
 
-    // Optional: Shoot sound when clicking anywhere
-    document.body.addEventListener('click', () => {
-      shootSound.play();
-    });
-
-    // Start with menu
-    window.onload = () => {
-      isPaused = true;
-    };
   </script>
 </body>
 </html>
