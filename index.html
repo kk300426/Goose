@@ -24,8 +24,6 @@
       height: 100%;
       object-fit: cover;
       z-index: 0;
-      top: 0;
-      left: 0;
     }
 
     #timer {
@@ -99,30 +97,17 @@
       margin: 10px 0;
     }
 
-    /* Start Game Popup */
-    #startPopup {
+    #pauseBtn {
       position: fixed;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -30%);
-      background: white;
-      padding: 30px 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      text-align: center;
-      z-index: 1000;
-    }
-
-    #startPopup button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-
-    #instructions {
-      display: none;
-      margin-top: 10px;
-      font-size: 16px;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10;
+      font-size: 24px;
+      background: rgba(255,255,255,0.8);
+      border: none;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -136,19 +121,6 @@
   <audio id="shootSound" src="https://www.fesliyanstudios.com/play-mp3/387"></audio>
   <audio id="hitSound" src="https://www.fesliyanstudios.com/play-mp3/6676"></audio>
 
-  <!-- Start Game Popup -->
-  <div id="startPopup">
-    <h2>Goose Shooting Game</h2>
-    <button id="newGameBtn">New Game</button>
-    <button id="continueBtn">Continue</button>
-    <button id="howToPlayBtn">How to Play</button>
-    <div id="instructions">
-      Click on geese to shoot them.<br/>
-      Each hit gives you 10 points.<br/>
-      Reach the target score before time runs out!
-    </div>
-  </div>
-
   <!-- Level Popup -->
   <div id="levelPopup">
     <div id="popupMessage"></div>
@@ -157,27 +129,43 @@
     <button id="retryBtn">Try Again</button>
   </div>
 
+  <!-- Pause Button -->
+  <button id="pauseBtn">⏸️</button>
+
   <script>
     let score = 0;
     let level = 1;
     let speed = 5;
     let timer = 60;
     let gameTimer;
-    let hasSavedState = false;
-    let savedScore = 0;
-    let savedLevel = 1;
+    let isPaused = false;
 
     const scoreBoard = document.getElementById('scoreBoard');
     const shootSound = document.getElementById('shootSound');
     const hitSound = document.getElementById('hitSound');
     const timerDisplay = document.getElementById("timer");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const background = document.getElementById("background");
+
+    pauseBtn.addEventListener("click", () => {
+      isPaused = !isPaused;
+      pauseBtn.textContent = isPaused ? "▶️" : "⏸️";
+      if (isPaused) {
+        clearInterval(gameTimer);
+      } else {
+        startTimer();
+      }
+    });
 
     function startTimer() {
+      clearInterval(gameTimer);
       gameTimer = setInterval(() => {
-        timer--;
-        timerDisplay.textContent = `Time: ${timer}s`;
-        if (timer <= 0) {
-          endGame();
+        if (!isPaused) {
+          timer--;
+          timerDisplay.textContent = `Time: ${timer}s`;
+          if (timer <= 0) {
+            endGame();
+          }
         }
       }, 1000);
     }
@@ -186,35 +174,11 @@
       const goose = document.createElement('img');
       goose.classList.add('goose');
       goose.style.top = Math.random() * (window.innerHeight / 2) + 'px';
-
-      const bg = document.getElementById('background');
-      const bgRect = bg.getBoundingClientRect();
-      goose.style.left = bgRect.right - 150 + 'px';
-
+      goose.style.left = window.innerWidth - 150 + 'px';
       goose.direction = -1;
       goose.src = "Untitled-video-Made-with-Clipc-unscreen.gif";
       goose.style.transform = "scaleX(-1)";
       document.body.appendChild(goose);
-
-      function moveGoose() {
-        const left = parseInt(goose.style.left, 10) || goose.getBoundingClientRect().left;
-
-        if (left > bgRect.right - 150) {
-          goose.direction = -1;
-          goose.style.transform = "scaleX(-1)";
-        }
-
-        if (left < bgRect.left) {
-          goose.direction = 1;
-          goose.style.transform = "scaleX(1)";
-        }
-
-        goose.style.left = left + goose.direction * speed + 'px';
-
-        if (!goose.classList.contains('falling')) {
-          requestAnimationFrame(moveGoose);
-        }
-      }
 
       goose.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -224,11 +188,40 @@
         scoreBoard.innerText = `Score: ${score}`;
         setTimeout(() => {
           goose.remove();
-          createGoose(); // spawn another goose
+          createGoose();
         }, 2000);
       });
 
-      moveGoose();
+      moveGoose(goose);
+    }
+
+    function moveGoose(goose) {
+      const bgRect = background.getBoundingClientRect();
+
+      function animate() {
+        if (isPaused || goose.classList.contains('falling')) {
+          requestAnimationFrame(animate);
+          return;
+        }
+
+        const left = parseInt(goose.style.left, 10) || goose.getBoundingClientRect().left;
+
+        if (left > bgRect.right - 150) {
+          goose.direction = -1;
+          goose.style.transform = "scaleX(-1)";
+        }
+
+        if (left < bgRect.left - 160) {
+          goose.remove();
+          createGoose();
+          return;
+        }
+
+        goose.style.left = left + goose.direction * speed + 'px';
+        requestAnimationFrame(animate);
+      }
+
+      animate();
     }
 
     function spawnGeese(count) {
@@ -239,9 +232,6 @@
 
     function endGame() {
       clearInterval(gameTimer);
-      savedScore = score;
-      savedLevel = level;
-      hasSavedState = true;
       showLevelPopup();
     }
 
@@ -283,7 +273,6 @@
       score = 0;
       timerDisplay.textContent = `Time: ${timer}s`;
       scoreBoard.innerText = `Score: ${score}`;
-      document.querySelectorAll('.goose').forEach(g => g.remove());
       startTimer();
       spawnGeese(level);
     });
@@ -294,7 +283,6 @@
       score = 0;
       timerDisplay.textContent = `Time: ${timer}s`;
       scoreBoard.innerText = `Score: ${score}`;
-      document.querySelectorAll('.goose').forEach(g => g.remove());
       startTimer();
       spawnGeese(level);
     });
@@ -303,40 +291,9 @@
       shootSound.play();
     });
 
-    // Start Game Popup logic
-    document.getElementById('startPopup').style.display = 'block';
-
-    document.getElementById('newGameBtn').addEventListener('click', () => {
-      score = 0;
-      level = 1;
-      speed = 5;
-      timer = 60;
-      hasSavedState = true;
-      startGame();
-    });
-
-    document.getElementById('continueBtn').addEventListener('click', () => {
-      if (hasSavedState) {
-        score = savedScore;
-        level = savedLevel;
-        startGame();
-      } else {
-        alert("No saved game found.");
-      }
-    });
-
-    document.getElementById('howToPlayBtn').addEventListener('click', () => {
-      const instr = document.getElementById('instructions');
-      instr.style.display = instr.style.display === 'none' ? 'block' : 'none';
-    });
-
-    function startGame() {
-      document.getElementById('startPopup').style.display = 'none';
-      timerDisplay.textContent = `Time: ${timer}s`;
-      scoreBoard.innerText = `Score: ${score}`;
-      spawnGeese(level);
-      startTimer();
-    }
+    // Start game
+    startTimer();
+    spawnGeese(level);
   </script>
 </body>
 </html>
