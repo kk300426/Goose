@@ -471,6 +471,91 @@
         showLevelSelector();
       }
     }
+document.getElementById('newGameBtn').addEventListener('click', () => {
+      document.getElementById('startPopup').style.display = 'none';
+      document.getElementById('levelSelector').style.display = 'block';
+      generateLevelButtons();
+    });
+
+    document.getElementById('howToPlayBtn').addEventListener('click', () => {
+      const instructions = document.getElementById('instructions');
+      instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+      isPaused = true;
+      document.getElementById('pauseMenu').style.display = 'block';
+    });
+
+    function resumeGame() {
+      isPaused = false;
+      document.getElementById('pauseMenu').style.display = 'none';
+    }
+
+    function restartGame() {
+      location.reload();
+    }
+
+    function goToMenu() {
+      location.reload();
+    }
+
+    function startGame(selectedLevel) {
+      level = selectedLevel;
+      score = 0;
+      speed = level * 5;
+      timer = 40;
+      isPaused = false;
+
+      document.getElementById('levelSelector').style.display = 'none';
+      document.getElementById('pauseMenu').style.display = 'none';
+      document.getElementById('levelPopup').style.display = 'none';
+      document.getElementById('scoreBoard').innerText = `Score: ${score}`;
+      document.getElementById('timer').innerText = `Time: ${timer}s`;
+
+      startTimer();
+      spawnGeese(level + 2); // Increase geese with level
+    }
+
+    function generateLevelButtons() {
+      const container = document.getElementById('levelButtons');
+      container.innerHTML = '';
+      const totalLevels = 10;
+
+      for (let i = 1; i <= totalLevels; i++) {
+        const button = document.createElement('button');
+        const stars = localStorage.getItem(`level_${i}_stars`) || '';
+        button.innerText = `Level ${i}\n${stars}`;
+        button.onclick = () => startGame(i);
+        container.appendChild(button);
+      }
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      level++;
+      startGame(level);
+    });
+
+    document.getElementById('retryBtn').addEventListener('click', () => {
+      startGame(level);
+    });
+
+    function resetProgress() {
+      for (let i = 1; i <= 10; i++) {
+        localStorage.removeItem(`level_${i}_stars`);
+      }
+      generateLevelButtons();
+    }
+
+    // Optional: Shoot sound when clicking anywhere
+    document.body.addEventListener('click', () => {
+      shootSound.play();
+    });
+
+    // Start with menu
+    window.onload = () => {
+      isPaused = true;
+    };
   </script>
 </body>
 </html>
