@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Goose Shooter</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #background {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      z-index: 0;
+    }
+
+    #goose {
+      position: absolute;
+      top: 100px;
+      left: -300px;
+      width: 200px;
+      z-index: 1;
+    }
+
+    #crosshair {
+      position: absolute;
+      width: 100px;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0.8;
+    }
+
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      color: white;
+      z-index: 4;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <img id="background" src="background.jpg">
+    
+    <video id="goose" autoplay loop muted playsinline>
+      <source src="goose.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    
+    <img id="crosshair" src="crosshair.jpg">
+    
+    <div id="score">Score: 0</div>
+  </div>
+
+  <script>
+    const goose = document.getElementById("goose");
+    const crosshair = document.getElementById("crosshair");
+    const scoreBoard = document.getElementById("score");
+    let score = 0;
+
+    // Move goose across screen
+    function flyGoose() {
+      let posX = -300;
+      setInterval(() => {
+        posX += 5;
+        goose.style.left = posX + 'px';
+        if (posX > window.innerWidth + 100) {
+          posX = -300;
+        }
+      }, 30);
+    }
+    flyGoose();
+
+    // Aim crosshair
+    document.addEventListener("mousemove", (e) => {
+      crosshair.style.left = (e.clientX - 50) + "px";
+      crosshair.style.top = (e.clientY - 50) + "px";
+    });
+
+    // Shoot goose
+    document.addEventListener("click", (e) => {
+      const rect = goose.getBoundingClientRect();
+      if (
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
+      ) {
+        score++;
+        scoreBoard.textContent = "Score: " + score;
+        goose.style.left = '-300px'; // reset
+      }
+    });
+  </script>
+</body>
+</html>
