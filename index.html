@@ -98,6 +98,32 @@
       font-size: 30px;
       margin: 10px 0;
     }
+
+    /* Start Game Popup */
+    #startPopup {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -30%);
+      background: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      text-align: center;
+      z-index: 1000;
+    }
+
+    #startPopup button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+
+    #instructions {
+      display: none;
+      margin-top: 10px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -109,6 +135,19 @@
   <div id="scoreBoard">Score: 0</div>
   <audio id="shootSound" src="https://www.fesliyanstudios.com/play-mp3/387"></audio>
   <audio id="hitSound" src="https://www.fesliyanstudios.com/play-mp3/6676"></audio>
+
+  <!-- Start Game Popup -->
+  <div id="startPopup">
+    <h2>Goose Shooting Game</h2>
+    <button id="newGameBtn">New Game</button>
+    <button id="continueBtn">Continue</button>
+    <button id="howToPlayBtn">How to Play</button>
+    <div id="instructions">
+      Click on geese to shoot them.<br/>
+      Each hit gives you 10 points.<br/>
+      Reach the target score before time runs out!
+    </div>
+  </div>
 
   <!-- Level Popup -->
   <div id="levelPopup">
@@ -124,6 +163,10 @@
     let speed = 5;
     let timer = 60;
     let gameTimer;
+    let hasSavedState = false;
+    let savedScore = 0;
+    let savedLevel = 1;
+
     const scoreBoard = document.getElementById('scoreBoard');
     const shootSound = document.getElementById('shootSound');
     const hitSound = document.getElementById('hitSound');
@@ -196,6 +239,9 @@
 
     function endGame() {
       clearInterval(gameTimer);
+      savedScore = score;
+      savedLevel = level;
+      hasSavedState = true;
       showLevelPopup();
     }
 
@@ -257,9 +303,40 @@
       shootSound.play();
     });
 
-    // Start game
-    startTimer();
-    spawnGeese(level);
+    // Start Game Popup logic
+    document.getElementById('startPopup').style.display = 'block';
+
+    document.getElementById('newGameBtn').addEventListener('click', () => {
+      score = 0;
+      level = 1;
+      speed = 5;
+      timer = 60;
+      hasSavedState = true;
+      startGame();
+    });
+
+    document.getElementById('continueBtn').addEventListener('click', () => {
+      if (hasSavedState) {
+        score = savedScore;
+        level = savedLevel;
+        startGame();
+      } else {
+        alert("No saved game found.");
+      }
+    });
+
+    document.getElementById('howToPlayBtn').addEventListener('click', () => {
+      const instr = document.getElementById('instructions');
+      instr.style.display = instr.style.display === 'none' ? 'block' : 'none';
+    });
+
+    function startGame() {
+      document.getElementById('startPopup').style.display = 'none';
+      timerDisplay.textContent = `Time: ${timer}s`;
+      scoreBoard.innerText = `Score: ${score}`;
+      spawnGeese(level);
+      startTimer();
+    }
   </script>
 </body>
 </html>
