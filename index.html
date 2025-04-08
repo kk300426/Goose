@@ -143,7 +143,11 @@
       const goose = document.createElement('img');
       goose.classList.add('goose');
       goose.style.top = Math.random() * (window.innerHeight / 2) + 'px';
-      goose.style.left = window.innerWidth - 150 + 'px';
+
+      const bg = document.getElementById('background');
+      const bgRect = bg.getBoundingClientRect();
+      goose.style.left = bgRect.right - 150 + 'px';
+
       goose.direction = -1;
       goose.src = "Untitled-video-Made-with-Clipc-unscreen.gif";
       goose.style.transform = "scaleX(-1)";
@@ -152,12 +156,12 @@
       function moveGoose() {
         const left = parseInt(goose.style.left, 10) || goose.getBoundingClientRect().left;
 
-        if (left > window.innerWidth - 150) {
+        if (left > bgRect.right - 150) {
           goose.direction = -1;
           goose.style.transform = "scaleX(-1)";
         }
 
-        if (left < 0) {
+        if (left < bgRect.left) {
           goose.direction = 1;
           goose.style.transform = "scaleX(1)";
         }
