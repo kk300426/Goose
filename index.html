@@ -136,6 +136,36 @@
       border-radius: 50%;
       cursor: pointer;
     }
+
+    /* === Swap Panel Styles === */
+    #swapPanel {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    #deswapBtn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ffcc00;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    #swapPoint {
+      padding: 10px 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -169,11 +199,18 @@
     <button id="retryBtn">Try Again</button>
   </div>
 
+  <!-- Swap Panel -->
+  <div id="swapPanel">
+    <button id="deswapBtn">Deswap</button>
+    <div id="swapPoint">Swapping Point</div>
+  </div>
+
   <script>
+    // Your original script unchanged...
     let score = 0;
     let level = 1;
     let speed = 5;
-    let timer = 40; // Changed from 60 to 40
+    let timer = 40;
     let gameTimer;
     let hasSavedState = false;
     let savedScore = 0;
@@ -222,7 +259,6 @@
         const left = parseInt(goose.style.left, 10) || goose.getBoundingClientRect().left;
         goose.style.left = left + goose.direction * speed + 'px';
 
-        // Despawn goose if offscreen to the left
         if (left < bgRect.left - 160) {
           goose.remove();
           createGoose();
@@ -319,7 +355,6 @@
       shootSound.play();
     });
 
-    // Pause button logic
     pauseBtn.addEventListener("click", () => {
       isPaused = !isPaused;
       pauseBtn.textContent = isPaused ? "▶️" : "⏸️";
