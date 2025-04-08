@@ -137,34 +137,17 @@
       cursor: pointer;
     }
 
-    /* === Swap Panel Styles === */
-    #swapPanel {
-      position: fixed;
-      top: 100px;
-      right: 20px;
-      z-index: 999;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 10px;
-    }
-
     #deswapBtn {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #ffcc00;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 10;
+      font-size: 24px;
+      background: rgba(255,255,255,0.8);
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    #swapPoint {
       padding: 10px 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      font-weight: bold;
-      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -174,8 +157,10 @@
     <img src="background.jpg" id="background" alt="Background" />
     <img src="gun.png" id="gun" alt="Gun" />
   </div>
+
   <div id="scoreBoard">Score: 0</div>
   <button id="pauseBtn">⏸️</button>
+  <button id="deswapBtn">Deswap</button>
 
   <audio id="shootSound" src="https://www.fesliyanstudios.com/play-mp3/387"></audio>
   <audio id="hitSound" src="https://www.fesliyanstudios.com/play-mp3/6676"></audio>
@@ -199,14 +184,7 @@
     <button id="retryBtn">Try Again</button>
   </div>
 
-  <!-- Swap Panel -->
-  <div id="swapPanel">
-    <button id="deswapBtn">Deswap</button>
-    <div id="swapPoint">Swapping Point</div>
-  </div>
-
   <script>
-    // Your original script unchanged...
     let score = 0;
     let level = 1;
     let speed = 5;
@@ -216,12 +194,20 @@
     let savedScore = 0;
     let savedLevel = 1;
     let isPaused = false;
+    let enableSwap = true;
+    const swapX = window.innerWidth / 2;
 
     const scoreBoard = document.getElementById('scoreBoard');
     const shootSound = document.getElementById('shootSound');
     const hitSound = document.getElementById('hitSound');
     const timerDisplay = document.getElementById("timer");
     const pauseBtn = document.getElementById("pauseBtn");
+    const deswapBtn = document.getElementById("deswapBtn");
+
+    deswapBtn.addEventListener("click", () => {
+      enableSwap = !enableSwap;
+      deswapBtn.textContent = enableSwap ? "Deswap" : "Reswap";
+    });
 
     function startTimer() {
       clearInterval(gameTimer);
@@ -259,7 +245,17 @@
         const left = parseInt(goose.style.left, 10) || goose.getBoundingClientRect().left;
         goose.style.left = left + goose.direction * speed + 'px';
 
-        if (left < bgRect.left - 160) {
+        // Swap direction if enabled
+        if (enableSwap && ((goose.direction === -1 && left <= swapX) || (goose.direction === 1 && left >= swapX))) {
+          goose.direction *= -1;
+          goose.style.transform = goose.direction === -1 ? "scaleX(-1)" : "scaleX(1)";
+        }
+
+        if (goose.direction === -1 && left < bgRect.left - 160) {
+          goose.remove();
+          createGoose();
+          return;
+        } else if (goose.direction === 1 && left > bgRect.right + 160) {
           goose.remove();
           createGoose();
           return;
