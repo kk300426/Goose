@@ -298,11 +298,18 @@
       moveGoose();
     }
 
-    function spawnGeese(count) {
-      for (let i = 0; i < count; i++) {
-        setTimeout(() => createGoose(), i * 300);
-      }
+ function spawnGeese(count) {
+  let spawned = 0;
+  const interval = setInterval(() => {
+    if (spawned < count) {
+      createGoose();
+      spawned++;
+    } else {
+      clearInterval(interval);
     }
+  }, 1000); // 1 goose every 1000ms (1 second)
+}
+
 
     function endGame() {
       clearInterval(gameTimer);
@@ -453,6 +460,8 @@
         showLevelSelector();
       }
     }
+
+
   </script>
 </body>
 </html>
