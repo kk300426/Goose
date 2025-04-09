@@ -228,7 +228,6 @@
     let score = 0;
     let level = 1;
     let speed = 5;
-    let goldenGeeseSpawned = 0;
     let timer = 40;
     let gameTimer;
     let isPaused = false;
@@ -248,77 +247,58 @@
             endGame();
           }
         }
-      }, 1000);
+      }, 2000);
     }
 
-let goldenGeeseSpawned = 0;
+    function createGoose() {
+      const goose = document.createElement('img');
+      goose.classList.add('goose');
+      const isBig = Math.random() < 0.1;
+      goose.src = "Untitled-video-Made-with-Clipc-unscreen.gif";
+      goose.src = isBig ? "ggg.gif" : "Untitled-video-Made-with-Clipc-unscreen.gif";
+      goose.dataset.points = isBig ?50 : 10;
 
-function createGoose() {
-  const goose = document.createElement('img');
-  goose.classList.add('goose');
+      goose.style.top = Math.random() * (window.innerHeight / 2) + 'px';
+      const bg = document.getElementById('background');
+      const bgRect = bg.getBoundingClientRect();
+      goose.style.left = bgRect.right - 150 + 'px';
 
-  // Determine if this goose should be golden
-  let isGolden = false;
-  if (goldenGeeseSpawned < 3 && Math.random() < 0.2) {
-    isGolden = true;
-    goldenGeeseSpawned++;
-  }
+      goose.direction = -1;
+      goose.style.transform = "scaleX(-1)";
+      document.body.appendChild(goose);
 
-  if (isGolden) {
-    goose.src = "ggg.gif"; // Replace with actual golden goose image URL
-    goose.style.width = "120px";
-    goose.dataset.points = 50;
-  } else {
-   const isGolden = goldenGeeseSpawned < 3 && Math.random() < 0.2;
-if (isGolden) goldenGeeseSpawned++;
-goose.src = isGolden ? "ggg.gif" : "Untitled-video-Made-with-Clipc-unscreen.gif";
-goose.style.width = isGolden ? "120px" : "150px";
-goose.dataset.points = isGolden ? 50 : 10;
+      function moveGoose() {
+        if (goose.classList.contains('falling') || isPaused) {
+          requestAnimationFrame(moveGoose);
+          return;
+        }
 
-  }
+        const left = parseInt(goose.style.left, 10) || goose.getBoundingClientRect().left;
+        goose.style.left = left + goose.direction * (speed / 10) + 'px';
 
-  goose.style.top = Math.random() * (window.innerHeight / 2) + 'px';
-  const bg = document.getElementById('background');
-  const bgRect = bg.getBoundingClientRect();
-  goose.style.left = bgRect.right - 150 + 'px';
+        if (left < bgRect.left - 160) {
+          goose.remove();
+          createGoose();
+          return;
+        }
 
-  goose.direction = -1;
-  goose.style.transform = "scaleX(-1)";
-  document.body.appendChild(goose);
+        requestAnimationFrame(moveGoose);
+      }
 
-  function moveGoose() {
-    if (goose.classList.contains('falling') || isPaused) {
-      requestAnimationFrame(moveGoose);
-      return;
+      goose.addEventListener('click', (e) => {
+        e.stopPropagation();
+        hitSound.play();
+        goose.classList.add('falling');
+        score += parseInt(goose.dataset.points);
+        scoreBoard.innerText = `Score: ${score}`;
+        setTimeout(() => {
+          goose.remove();
+          createGoose();
+        }, 2000);
+      });
+
+      moveGoose();
     }
-
-    const left = parseInt(goose.style.left, 10) || goose.getBoundingClientRect().left;
-    goose.style.left = left + goose.direction * (speed / 10) + 'px';
-
-    if (left < bgRect.left - 160) {
-      goose.remove();
-      createGoose();
-      return;
-    }
-
-    requestAnimationFrame(moveGoose);
-  }
-
-  goose.addEventListener('click', (e) => {
-    e.stopPropagation();
-    hitSound.play();
-    goose.classList.add('falling');
-    score += parseInt(goose.dataset.points);
-    scoreBoard.innerText = `Score: ${score}`;
-    setTimeout(() => {
-      goose.remove();
-      createGoose();
-    }, 2000);
-  });
-
-  moveGoose();
-}
-
 
  function spawnGeese(count) {
   let spawned = 0;
@@ -381,11 +361,10 @@ if (percentage >= 60) {
 
     document.getElementById("nextBtn").addEventListener("click", () => {
       document.getElementById("levelPopup").style.display = "none";
-level++;
-speed += 1;
-timer = 40;
-score = 0;
-goldenGeeseSpawned = 0;
+      level++;
+      speed += 1;
+      timer = 40;
+      score = 0;
       timerDisplay.textContent = `Time: ${timer}s`;
       scoreBoard.innerText = `Score: ${score}`;
       document.querySelectorAll('.goose').forEach(g => g.remove());
@@ -395,9 +374,8 @@ goldenGeeseSpawned = 0;
 
     document.getElementById("retryBtn").addEventListener("click", () => {
       document.getElementById("levelPopup").style.display = "none";
-timer = 40;
-score = 0;
-goldenGeeseSpawned = 0;
+      timer = 40;
+      score = 0;
       timerDisplay.textContent = `Time: ${timer}s`;
       scoreBoard.innerText = `Score: ${score}`;
       document.querySelectorAll('.goose').forEach(g => g.remove());
