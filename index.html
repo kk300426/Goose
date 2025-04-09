@@ -254,11 +254,10 @@
       const goose = document.createElement('img');
       goose.classList.add('goose');
       const isBig = Math.random() < 0.07;
-      const isSmall=Math.random()<0.1;
       goose.src = "Untitled-video-Made-with-Clipc-unscreen.gif";
       goose.src = isBig ? "ggg.gif" : "Untitled-video-Made-with-Clipc-unscreen.gif";
-      goose.style.width = isBig ? "100px" : (isSmall ?50:100);
-      goose.dataset.points = isBig ?50 :(isSmall ? 5:10);
+      goose.style.width = isBig ? "100px" :"100px";
+      goose.dataset.points = isBig ?50 :10;
       
       goose.style.top = Math.random() * (window.innerHeight / 2) + 'px';
       const bg = document.getElementById('background');
@@ -340,9 +339,9 @@
       let stars = '';
 
       if (percentage >= 90) stars = '⭐⭐⭐';
-      else if (percentage >= 60) stars = '⭐⭐❌';
-      else if(percentage 60<40) stars = '⭐❌❌';
-      else star='❌❌❌';
+      else if (percentage >= 60) stars = '⭐⭐';
+      else stars = '⭐';
+
 
       starsContainer.innerText = stars;
       updateStars(level, score, target);
