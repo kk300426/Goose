@@ -256,6 +256,7 @@
       const isBig = Math.random() < 0.1;
       goose.src = "Untitled-video-Made-with-Clipc-unscreen.gif";
       goose.src = isBig ? "ggg.gif" : "Untitled-video-Made-with-Clipc-unscreen.gif";
+      goose.style.width = isBig ? "150px" : "150px";
       goose.dataset.points = isBig ?50 : 10;
 
       goose.style.top = Math.random() * (window.innerHeight / 2) + 'px';
