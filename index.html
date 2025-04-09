@@ -218,8 +218,8 @@
   <div id="levelPopup">
     <div id="popupMessage"></div>
     <div id="stars"></div>
-  <button id="retryBtn">🔁</button>
-  <button id="nextBtn">▶️</button>
+    <button id="nextBtn">▶️</button>
+    <button id="retryBtn">🔁</button>
 
 
   </div>
@@ -253,12 +253,13 @@
     function createGoose() {
       const goose = document.createElement('img');
       goose.classList.add('goose');
-      const isBig = Math.random() < 0.1;
+      const isBig = Math.random() < 0.07;
+      const isSmall=Math.random()<0.1;
       goose.src = "Untitled-video-Made-with-Clipc-unscreen.gif";
       goose.src = isBig ? "ggg.gif" : "Untitled-video-Made-with-Clipc-unscreen.gif";
-      goose.style.width = isBig ? "150px" : "150px";
-      goose.dataset.points = isBig ?50 : 10;
-
+      goose.style.width = isBig ? "100px" : (isSmall ?50:100);
+      goose.dataset.points = isBig ?50 :(isSmall ? 5:10);
+      
       goose.style.top = Math.random() * (window.innerHeight / 2) + 'px';
       const bg = document.getElementById('background');
       const bgRect = bg.getBoundingClientRect();
@@ -339,8 +340,9 @@
       let stars = '';
 
       if (percentage >= 90) stars = '⭐⭐⭐';
-      else if (percentage >= 60) stars = '⭐⭐';
-      else stars = '⭐';
+      else if (percentage >= 60) stars = '⭐⭐❌';
+      else if(percentage 60<40) stars = '⭐❌❌';
+      else star='❌❌❌';
 
       starsContainer.innerText = stars;
       updateStars(level, score, target);
@@ -348,8 +350,8 @@
    popupMessage.innerText = `Level ${level} Complete! Score: ${score} / ${target}`;
 
 if (percentage >= 60) {
-   retryBtn.style.display = 'inline-block'; // 🔁
-  nextBtn.style.display = 'inline-block'; // ▶️
+     nextBtn.style.display = 'inline-block'; // ▶️
+  retryBtn.style.display = 'inline-block'; // 🔁
 
 } else {
   nextBtn.style.display = 'none';
