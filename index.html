@@ -218,8 +218,9 @@
   <div id="levelPopup">
     <div id="popupMessage"></div>
     <div id="stars"></div>
-    <button id="nextBtn">Next Level</button>
-    <button id="retryBtn">Try Again</button>
+<button id="nextBtn">▶️</button>
+<button id="retryBtn">🔁</button>
+
   </div>
 
   <script>
@@ -342,15 +343,16 @@
       starsContainer.innerText = stars;
       updateStars(level, score, target);
 
-      if (score >= target) {
-        popupMessage.innerText = `Level ${level} Complete!`;
-        nextBtn.style.display = 'inline-block';
-        retryBtn.style.display = 'none';
-      } else {
-        popupMessage.innerText = `Try Again! Score: ${score} / ${target}`;
-        nextBtn.style.display = 'none';
-        retryBtn.style.display = 'inline-block';
-      }
+   popupMessage.innerText = `Level ${level} Complete! Score: ${score} / ${target}`;
+
+if (percentage >= 60) {
+  nextBtn.style.display = 'inline-block'; // ▶️
+  retryBtn.style.display = 'inline-block'; // 🔁
+} else {
+  nextBtn.style.display = 'none';
+  retryBtn.style.display = 'inline-block';
+}
+
 
       popup.style.display = 'block';
     }
